@@ -47,7 +47,6 @@ public class CalculateSales {
 
 		//先にファイルの情報を格納する List(ArrayList) を宣言します。
 		List<File> rcdFiles = new ArrayList<>();
-		List<String> fileContents = new ArrayList<>();
 
 		//filesの数だけ繰り返すことで、
 		//指定したパスに存在するすべてのファイル(または、ディレクトリ)の数だけ繰り返されます。
@@ -61,7 +60,7 @@ public class CalculateSales {
 
 		//rcdFilesに複数の売上ファイルの情報を格納しているので、その数だけ繰り返します。
 		for (int i = 0; i < rcdFiles.size(); i++) {
-
+			List<String> fileContents = new ArrayList<>();
 			BufferedReader bufferedReader = null;
 			//支店定義ファイル読み込み(readFileメソッド)を参考に売上ファイルの中身を読み込みます。
 			//売上ファイルの1行目には支店コード、2行目には売上金額が入っています。
@@ -84,14 +83,14 @@ public class CalculateSales {
 				}
 				//売上ファイルから読み込んだ売上金額をMapに加算していくために、型の変換を行います。
 				//※詳細は後述で説明
-				long fileSale = Long.parseLong(fileContents.get(i * 2 + 1));
+				long fileSale = Long.parseLong(fileContents.get(1));
 
 				//読み込んだ売上金額を加算します。
 				//※詳細は後述で説明
-				Long saleAmount = branchSales.get(fileContents.get(i * 2)) + fileSale;
+				Long saleAmount = branchSales.get(fileContents.get(0)) + fileSale;
 
 				//加算した売上金額をMapに追加します。
-				branchSales.put(fileContents.get(i * 2), saleAmount);
+				branchSales.put(fileContents.get(0), saleAmount);
 
 			} catch (IOException e) {
 				System.out.println(UNKNOWN_ERROR);
@@ -99,7 +98,7 @@ public class CalculateSales {
 			} finally {
 				try {
 					bufferedReader.close();
-				} catch (IOException c) {
+				} catch (IOException e) {
 					System.out.println(UNKNOWN_ERROR);
 					return;
 				}
@@ -192,7 +191,7 @@ public class CalculateSales {
 		} finally {
 			try {
 				bw.close();
-			} catch (IOException c) {
+			} catch (IOException e) {
 				System.out.println(UNKNOWN_ERROR);
 				return false;
 			}
