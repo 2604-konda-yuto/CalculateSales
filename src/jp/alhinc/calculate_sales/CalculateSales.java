@@ -43,12 +43,11 @@ public class CalculateSales {
 		// ※ここから集計処理を作成してください。(処理内容2-1、2-2)
 		//listFilesを使用してfilesという配列に、
 		//指定してパスに存在するすべてのファイル(または、ディレクトリ)の情報を格納します。
-		File[] files = new File("C:\\Users\\trainee1476\\Desktop\\売り上げ集計課題").listFiles();
+		File[] files = new File(args[0]).listFiles();
 
 		//先にファイルの情報を格納する List(ArrayList) を宣言します。
 		List<File> rcdFiles = new ArrayList<>();
-		List<String> Data = new ArrayList<>();
-		List<String>  Branchcode= new ArrayList<>();
+		List<String>  branchCode = new ArrayList<>();
 
 
 		//filesの数だけ繰り返すことで、
@@ -56,9 +55,9 @@ public class CalculateSales {
 		for(int i = 0; i < files.length ; i++) {
 			//files[i].getName()でファイル名が取得できます。
 			files[i].getName();
-			if(files[i].getName().matches("[0-9]{8}.+rcd$")) {
+			if(files[i].getName().matches("^[0-9]{8}(.)rcd$")) {
 				//売上ファイルの条件に当てはまったものだけ、List(ArrayList)に追加します。
-					rcdFiles.add(files[i]);
+				rcdFiles.add(files[i]);
 			}
 		}
 
@@ -69,8 +68,7 @@ public class CalculateSales {
 			//売上ファイルの1行目には支店コード、2行目には売上金額が入っています。
 			 try {
 		            // ファイルのパスを指定する
-		            File file = new File("C:\\Users\\trainee1476\\Desktop\\売り上げ集計課題"
-		            		,rcdFiles.get(i).getName());
+		            File file = new File(args[0], rcdFiles.get(i).getName());
 
 		            // ファイルが存在しない場合に例外が発生するので確認する
 		            if (!file.exists()) {
@@ -84,22 +82,21 @@ public class CalculateSales {
 		            String data;
 		            while ((data = bufferedReader.readLine()) != null) {
 		            	if(data.matches("^([1-9][0-9]*)$")){
-		            		System.out.println(data);
-		            		Data.add(data);
+		            		branchCode.add(1, data);
 		            	}else if(data.matches("^[0-9]*$")){
-		            		Branchcode.add(data);
+		            		branchCode.add(0, data);
 		            	}
 		            }
 		          //売上ファイルから読み込んだ売上金額をMapに加算していくために、型の変換を行います。
 	    			//※詳細は後述で説明
-	    			long fileSale = Long.parseLong(Data.get(i));
+	    			long fileSale = Long.parseLong(branchCode.get(1));
 
 		          //読み込んだ売上金額を加算します。
 	    			//※詳細は後述で説明
-	    			Long saleAmount = branchSales.get(Branchcode.get(i)) + fileSale;
+	    			Long saleAmount = branchSales.get(branchCode.get(0)) + fileSale;
 
 			        //加算した売上金額をMapに追加します。
-		            branchSales.put(Branchcode.get(i),saleAmount);
+		            branchSales.put(branchCode.get(0), saleAmount);
 
 		            // 最後にファイルを閉じてリソースを開放する
 		            bufferedReader.close();
@@ -143,7 +140,7 @@ public class CalculateSales {
 
 				//Mapに追加する2つの情報を putの引数として指定します。
 				branchNames.put(items[0], items[1]);
-				branchSales.put(items[0],(long) 0);
+				branchSales.put(items[0], 0L);
 			}
 
 		} catch(IOException e) {
@@ -176,14 +173,11 @@ public class CalculateSales {
 	private static boolean writeFile(String path, String fileName, Map<String, String> branchNames, Map<String, Long> branchSales) {
 		// ※ここに書き込み処理を作成してください。(処理内容3-1)
 
-
+		BufferedWriter bw = null;
 		try {
-			File file = new File("C:\\Users\\trainee1476\\Desktop\\売り上げ集計課題","branch.out");
-			if (file.createNewFile()) {
-	            System.out.println("File created: " + file.getName());
-			}
+			File file = new File(path,fileName);
 			FileWriter fw = new FileWriter(file);
-			BufferedWriter bw = new BufferedWriter(fw);
+			bw = new BufferedWriter(fw);
 			for (String key : branchNames.keySet()) {
 				//keyという変数には、Mapから取得したキーが代入されています。
 				//拡張for⽂で繰り返されているので、1つ⽬のキーが取得できたら、
@@ -191,11 +185,14 @@ public class CalculateSales {
 				bw.write(key + "、" + branchNames.get(key) + "、" + branchSales.get(key));
 				bw.newLine();
 			}
-			bw.close();
 		}catch(IOException e){
 				e.printStackTrace();
 		}finally {
+			 try {
+				 bw.close();
+	         }catch(IOException c){
 
+	         }
 		}
 
 
