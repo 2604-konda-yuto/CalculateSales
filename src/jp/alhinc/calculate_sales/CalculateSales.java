@@ -69,12 +69,12 @@ public class CalculateSales {
 				rcdFiles.add(files[i]);
 			}
 		}
-		for (int i = 1; i < rcdFiles.size(); i++) {
+		for (int i = 0; i < rcdFiles.size() - 1; i++) {
 			//売上ファイルを保持しているListをソート
 			Collections.sort(rcdFiles);
 
-			int former = Integer.parseInt(rcdFiles.get(i - 1).getName().substring(0, 8));
-			int latter = Integer.parseInt(rcdFiles.get(i).getName().substring(0, 8));
+			int former = Integer.parseInt(rcdFiles.get(i).getName().substring(0, 8));
+			int latter = Integer.parseInt(rcdFiles.get(i + 1).getName().substring(0, 8));
 
 			//比較する2つのファイル名の先頭から数字の8文字を切り出し、int型に変換します。
 			if ((latter - former) != 1) {
@@ -95,12 +95,6 @@ public class CalculateSales {
 			try {
 				// ファイルのパスを指定する
 				File file = new File(args[0], rcdFiles.get(i).getName());
-
-				// ファイルが存在しない場合に例外が発生するので確認する
-				if (!file.exists()) {
-					System.out.print(FILE_NOT_EXIST);
-					return;
-				}
 
 				// BufferedReaderクラスのreadLineメソッドを使って1行ずつ読み込み表示する
 				FileReader fileReader = new FileReader(file);
@@ -123,13 +117,14 @@ public class CalculateSales {
 				}
 				//売上ファイルから読み込んだ売上金額をMapに加算していくために、型の変換を行います。
 				//※詳細は後述で説明
-				long fileSale = Long.parseLong(fileContents.get(1));
 				if (!fileContents.get(1).matches("^[0-9]*$")) {
 					//売上⾦額が数字ではなかった場合は、
 					//エラーメッセージをコンソールに表⽰します。
 					System.out.println(UNKNOWN_ERROR);
 					return;
 				}
+				long fileSale = Long.parseLong(fileContents.get(1));
+
 				//読み込んだ売上金額を加算します。
 				//※詳細は後述で説明
 				Long saleAmount = branchSales.get(fileContents.get(0)) + fileSale;
@@ -177,6 +172,10 @@ public class CalculateSales {
 
 		try {
 			File file = new File(path, fileName);
+			if (!file.exists()) {
+				System.out.println(FILE_NOT_EXIST);
+				return false;
+			}
 			FileReader fr = new FileReader(file);
 			br = new BufferedReader(fr);
 
@@ -186,7 +185,7 @@ public class CalculateSales {
 				// ※ここの読み込み処理を変更してください。(処理内容1-2)
 				String[] items = line.split(",");
 
-				if ((items.length != 2) || (items[0].matches("^[0-9]{3}!$"))) {
+				if ((items.length != 2) || (!items[0].matches("^[0-9]{3}$"))) {
 					//⽀店定義ファイルの仕様が満たされていない場合、
 					//エラーメッセージをコンソールに表⽰します。
 					System.out.println(FILE_INVALID_FORMAT);
