@@ -186,7 +186,7 @@ public class CalculateSales {
 				// ※ここの読み込み処理を変更してください。(処理内容1-2)
 				String[] items = line.split(",");
 
-				if ((items.length != 2) || (items[0].matches("^[0-9]{3}$"))) {
+				if ((items.length != 2) || (items[0].matches("^[0-9]{3}!$"))) {
 					//⽀店定義ファイルの仕様が満たされていない場合、
 					//エラーメッセージをコンソールに表⽰します。
 					System.out.println(FILE_INVALID_FORMAT);
