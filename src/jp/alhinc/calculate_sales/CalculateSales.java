@@ -194,7 +194,7 @@ public class CalculateSales {
 	 * @return 読み込み可否
 	 */
 	private static boolean readFile(String path, String fileName, Map<String, String> codeName,
-			Map<String, Long> Sales, String regex, String definition) {
+			Map<String, Long> sales, String regex, String definition) {
 		BufferedReader br = null;
 
 		try {
@@ -219,7 +219,7 @@ public class CalculateSales {
 					return false;
 				}
 				codeName.put(items[0], items[1]);
-				Sales.put(items[0], 0L);
+				sales.put(items[0], 0L);
 			}
 
 		} catch (IOException e) {
@@ -249,8 +249,8 @@ public class CalculateSales {
 	 * @param 支店コードと売上金額を保持するMap
 	 * @return 書き込み可否
 	 */
-	private static boolean writeFile(String path, String fileName, Map<String, String> Names,
-			Map<String, Long> Sales) {
+	private static boolean writeFile(String path, String fileName, Map<String, String> names,
+			Map<String, Long> sales) {
 		// ※ここに書き込み処理を作成してください。(処理内容3-1)
 
 		BufferedWriter bw = null;
@@ -258,11 +258,11 @@ public class CalculateSales {
 			File file = new File(path, fileName);
 			FileWriter fw = new FileWriter(file);
 			bw = new BufferedWriter(fw);
-			for (String key : Names.keySet()) {
+			for (String key : names.keySet()) {
 				//keyという変数には、Mapから取得したキーが代入されています。
 				//拡張for⽂で繰り返されているので、1つ⽬のキーが取得できたら、
 				//2つ⽬の取得...といったように、次々とkeyという変数に上書きされていきます。
-				bw.write(key + "," + Names.get(key) + "," + Sales.get(key));
+				bw.write(key + "," + names.get(key) + "," + sales.get(key));
 				bw.newLine();
 			}
 		} catch (IOException e) {
