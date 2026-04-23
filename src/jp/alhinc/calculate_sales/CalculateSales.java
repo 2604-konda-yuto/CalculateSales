@@ -120,7 +120,7 @@ public class CalculateSales {
 					fileContents.add(data);
 				}
 				if (fileContents.size() != 3) {
-					//売上ファイルの行数が2行ではなかった場合は、
+					//売上ファイルの行数が3行ではなかった場合は、
 					//エラーメッセージをコンソールに表示します。
 					System.out.println(rcdFiles.get(i) + FILE_INVALID_FORMAT);
 					return;
@@ -193,14 +193,14 @@ public class CalculateSales {
 	 * @param 支店コードと売上金額を保持するMap
 	 * @return 読み込み可否
 	 */
-	private static boolean readFile(String path, String fileName, Map<String, String> branchNames,
-			Map<String, Long> branchSales, String string, String character) {
+	private static boolean readFile(String path, String fileName, Map<String, String> codeName,
+			Map<String, Long> totalAmount, String Regex, String Definition) {
 		BufferedReader br = null;
 
 		try {
 			File file = new File(path, fileName);
 			if (!file.exists()) {
-				System.out.println(character + FILE_NOT_EXIST);
+				System.out.println(Definition + FILE_NOT_EXIST);
 				return false;
 			}
 			FileReader fr = new FileReader(file);
@@ -212,19 +212,17 @@ public class CalculateSales {
 				// ※ここの読み込み処理を変更してください。(処理内容1-2)
 				String[] items = line.split(",");
 
-				if ((items.length != 2) || (!items[0].matches(string))) {
+				if ((items.length != 2) || (!items[0].matches(Regex))) {
 					//支店定義ファイルの仕様が満たされていない場合、
 					//エラーメッセージをコンソールに表示します。
-					System.out.println(character + FILE_INVALID_FORMAT);
+					System.out.println(Definition + FILE_INVALID_FORMAT);
 					return false;
 				}
-				branchNames.put(items[0], items[1]);
-				branchSales.put(items[0], 0L);
+				codeName.put(items[0], items[1]);
+				totalAmount.put(items[0], 0L);
 			}
 
-		} catch (
-
-		IOException e) {
+		} catch (IOException e) {
 			System.out.println(UNKNOWN_ERROR);
 			return false;
 		} finally {
@@ -251,8 +249,8 @@ public class CalculateSales {
 	 * @param 支店コードと売上金額を保持するMap
 	 * @return 書き込み可否
 	 */
-	private static boolean writeFile(String path, String fileName, Map<String, String> branchNames,
-			Map<String, Long> branchSales) {
+	private static boolean writeFile(String path, String fileName, Map<String, String> productName,
+			Map<String, Long> totalAmount) {
 		// ※ここに書き込み処理を作成してください。(処理内容3-1)
 
 		BufferedWriter bw = null;
@@ -260,11 +258,11 @@ public class CalculateSales {
 			File file = new File(path, fileName);
 			FileWriter fw = new FileWriter(file);
 			bw = new BufferedWriter(fw);
-			for (String key : branchNames.keySet()) {
+			for (String key : productName.keySet()) {
 				//keyという変数には、Mapから取得したキーが代入されています。
 				//拡張for⽂で繰り返されているので、1つ⽬のキーが取得できたら、
 				//2つ⽬の取得...といったように、次々とkeyという変数に上書きされていきます。
-				bw.write(key + "," + branchNames.get(key) + "," + branchSales.get(key));
+				bw.write(key + "," + productName.get(key) + "," + totalAmount.get(key));
 				bw.newLine();
 			}
 		} catch (IOException e) {
